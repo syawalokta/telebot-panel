@@ -1,5 +1,5 @@
 export default {
-  BOT_TOKEN: "YOUR_TOKEN_BOT",
+  BOT_TOKEN: "YOUR_TOKEN_BOT", //token from @botfather
   OWNER_ID: "YOUR_ID",
   OWNER_USERNAME: "YOUR_USERNANE",
   CHANNEL_URL: "https://t.me/CHANNEL",
