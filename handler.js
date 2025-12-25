@@ -1,17 +1,19 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+export default async bot => {
+  const pluginsPath = "./plugins";
 
-export default bot => {
-  const pluginDir = path.join(__dirname, "plugins");
-  for (const file of fs.readdirSync(pluginDir)) {
-    if (file.endsWith(".js")) {
-      import(path.join(pluginDir, file)).then(plugin => {
-        plugin.default(bot);
-      });
+  for (const file of fs.readdirSync(pluginsPath)) {
+    if (!file.endsWith(".js")) continue;
+
+    try {
+      const plugin = await import(`./plugins/${file}`);
+      plugin.default(bot);
+      console.log("✔ Plugin loaded:", file);
+    } catch (err) {
+      console.error("✖ Failed load plugin:", file);
+      console.error(err.message);
     }
   }
 };

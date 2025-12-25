@@ -1,6 +1,6 @@
 {
   "name": "pterodactyl-telegram-bot",
-  "version": "1.0.0",
+  "version": "26.12.25",
   "type": "module",
   "main": "index.js",
   "scripts": {

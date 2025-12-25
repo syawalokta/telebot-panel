@@ -47,14 +47,23 @@ export default bot => {
           return ctx.reply("❌ idpanel, ram, disk, cpu, expired harus angka.");
         }
 
-        // ===== CARI USER =====
+        // ===== CARI USER BERDASARKAN PANEL ID =====
         const user = findUserByPanelId(ctx.db, panelUserId);
         if (!user) {
-          return ctx.reply("❌ User dengan Panel User ID tersebut tidak ditemukan.");
+          return ctx.reply(
+            "❌ User dengan Panel User ID tersebut tidak ditemukan."
+          );
         }
 
-        if (user.telegram.role !== "customer") {
-          return ctx.reply("❌ Server hanya bisa dibuat untuk user CUSTOMER.");
+        // ===== VALIDASI ROLE TARGET (FIXED) =====
+        if (!["customer", "owner"].includes(user.telegram.role)) {
+          return ctx.reply(
+            "❌ Server hanya bisa dibuat untuk user CUSTOMER atau OWNER."
+          );
+        }
+
+        if (!user.panel?.user_id) {
+          return ctx.reply("❌ User belum memiliki akun panel.");
         }
 
         // ===== EXPIRED =====
@@ -74,7 +83,7 @@ Tenant: (@${user.telegram.username})`;
           user: user.panel.user_id,
           egg: config.DEFAULT_EGG_ID,
 
-          // SESUAI EGG oktodev
+          // SESUAI EGG OKTODEV
           docker_image: "docker.io/bionicc/nodejs-wabot:latest",
           startup: "{{STARTUP_CMD}}",
           environment: {
@@ -104,7 +113,9 @@ Tenant: (@${user.telegram.username})`;
 
         const server = res.data.attributes;
 
-        // ===== SIMPAN DATABASE =====
+        // ===== SIMPAN KE DATABASE =====
+        if (!user.servers) user.servers = [];
+
         user.servers.push({
           server_id: server.identifier,
           panel_id: server.id,
@@ -118,9 +129,9 @@ Tenant: (@${user.telegram.username})`;
           expired: expiredData
         });
 
-        // ===== RESPONSE ADMIN / OWNER =====
+        // ===== RESPONSE KE ADMIN / OWNER =====
         await ctx.reply(
-`✅ Server berhasil dibuat
+`✅ *Server berhasil dibuat*
 
 Pemilik   : @${user.telegram.username}
 Panel UID : ${user.panel.user_id}
@@ -132,30 +143,32 @@ RAM       : ${ram} MB
 Disk      : ${disk} MB
 CPU       : ${cpu} %
 Expired   : ${expiredData.text}
-Tanggal   : ${expiredDateText}`
+Tanggal   : ${expiredDateText}`,
+          { parse_mode: "Markdown" }
         );
 
-        // ===== NOTIFIKASI KE CUSTOMER =====
+        // ===== NOTIFIKASI KE USER =====
         try {
           await bot.telegram.sendMessage(
             user.telegram.id,
-`🎉 Server kamu berhasil dibuat
+`🎉 *Server kamu berhasil dibuat*
 
 Nama      : ${server.name}
 Server ID : ${server.identifier}
 Expired   : ${expiredData.text}
 Tanggal   : ${expiredDateText}
 
-[SPESIFIKASI]
-RAM       : ${ram} MB
-Disk      : ${disk} MB
-CPU       : ${cpu} %`
+*Spesifikasi*
+RAM  : ${ram} MB
+Disk : ${disk} MB
+CPU  : ${cpu} %`,
+            { parse_mode: "Markdown" }
           );
         } catch (_) {}
 
       } catch (err) {
-        console.error("ADDSRV ERROR:", err.message);
-        ctx.reply(`❌ Gagal membuat server\n${err.message}`);
+        console.error("ADDSRV ERROR:", err?.response?.data || err);
+        ctx.reply("❌ Gagal membuat server.");
       }
     }
   );
