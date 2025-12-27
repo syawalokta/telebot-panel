@@ -1,4 +1,5 @@
 import permission from "../lib/permission.js";
+import { escapeMarkdown } from "../lib/escape.js";
 
 /**
  * Format angka ke Rupiah
@@ -18,15 +19,17 @@ export default bot => {
         return ctx.reply("❌ Data user tidak ditemukan.");
       }
 
-      const servers = user.servers || [];
+      // 🔒 ESCAPE MARKDOWN (WAJIB)
+      const name = escapeMarkdown(ctx.from.first_name || "-");
+      const username = escapeMarkdown(user.telegram.username || "-");
+      const role = (user.telegram.role || "user").toUpperCase();
 
-      // Hitung server aktif & expired
+      const servers = user.servers || [];
+      const now = Date.now();
+
       let active = 0;
       let expired = 0;
 
-      const now = Date.now();
-
-      // Total resource
       let totalRam = 0;
       let totalDisk = 0;
       let totalCpu = 0;
@@ -38,20 +41,21 @@ export default bot => {
           expired++;
         }
 
-        totalRam += srv.resource?.ram || 0;
-        totalDisk += srv.resource?.disk || 0;
-        totalCpu += srv.resource?.cpu || 0;
+        totalRam += Number(srv.resource?.ram || 0);
+        totalDisk += Number(srv.resource?.disk || 0);
+        totalCpu += Number(srv.resource?.cpu || 0);
       }
 
-      const balance = user.wallet?.balance ?? 0;
+      // WALLET
+      const balance = Number(user.wallet?.balance || 0);
 
       const msg =
 `👤 *PROFIL AKUN*
 
 *INFO USER*
-Nama     : ${ctx.from.first_name ?? "-"}
-Username : @${user.telegram.username}
-Role     : ${user.telegram.role.toUpperCase()}
+Nama     : ${name}
+Username : @${username}
+Role     : ${role}
 
 *PANEL*
 User ID  : ${user.panel?.user_id ?? "-"}
@@ -68,9 +72,11 @@ Disk : ${totalDisk} MB
 CPU  : ${totalCpu} %
 
 *SALDO*
-Saldo Aktif : ${formatRupiah(balance)}`;
+Saldo Aktif : ${formatRupiah(balance)}
 
-      ctx.reply(msg, { parse_mode: "Markdown" });
+ℹ️ Untuk melihat semua server gunakan /mysrv`;
+
+      return ctx.reply(msg, { parse_mode: "Markdown" });
     }
   );
 };
