@@ -1,0 +1,41 @@
+CHANGELOG
+[+] Penambahan Fitur
+[+] Sistem bot Telegram berbasis plugin
+[+] Role & permission system (user, customer, admin, owner)
+[+] Integrasi Pterodactyl Panel (Application API)
+[+] Auto create user saat /start
+[+] Manajemen server (add, delete, list, start, stop)
+[+] /mysrv untuk melihat server milik user
+[+] Sistem saldo & wallet
+[+] Deposit manual + invoice
+[+] Konfirmasi deposit oleh owner (/confirm, /reject)
+[+] Auto expire invoice deposit
+[+] Pricelist hosting
+[+] Buy server otomatis (/buyserver)
+[+] Auto create user panel saat beli server
+[+] Extend server (/extendserver)
+[+] Update expired & deskripsi server otomatis
+[+] List command otomatis (/listcommand)
+[+] Profile user (/profile)
+[+] Saldo user (/saldo)
+[+] Hardening owner & role protection
+[+] Debug mode
+
+[-] Perbaikan & Fix
+[-] Fix bot membalas pesan lama saat restart
+[-] Fix error 429 Too Many Requests
+[-] Fix semua command mati akibat bot.on("text")
+[-] Fix konflik multiple instance bot (409 error)
+[-] Fix endpoint Pterodactyl power (client vs application)
+[-] Fix HTTP method salah (PUT → PATCH)
+[-] Fix update server description (wajib kirim user)
+[-] Fix struktur config.js (ATLANTIC & DEPOSIT terpisah)
+[-] Fix error Markdown Telegram (escape input user)
+[-] Fix saldo tidak terbaca karena struktur wallet
+[-] Fix deposit ganda / invoice spam
+[-] Fix user lama tidak punya wallet
+[-] Fix /mysrv resource kosong
+[-] Fix crash plugin karena ctx undefined
+[-] Fix bot tidak respon command tertentu
+[-] Fix handler plugin load error
+[-] Fix error saat extend server
