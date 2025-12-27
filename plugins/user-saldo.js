@@ -1,10 +1,11 @@
 import permission from "../lib/permission.js";
+import { escapeMarkdown } from "../lib/escape.js";
 
 /**
  * Format Rupiah
  */
 function formatRupiah(num = 0) {
-  return "Rp " + num.toLocaleString("id-ID");
+  return "Rp " + Number(num || 0).toLocaleString("id-ID");
 }
 
 export default bot => {
@@ -16,34 +17,41 @@ export default bot => {
       const user = ctx.db.users[id];
 
       if (!user) {
-        return ctx.reply("❌ Data user tidak ditemukan. Silakan /start terlebih dahulu.");
+        return ctx.reply(
+          "❌ Data user tidak ditemukan. Silakan /start terlebih dahulu."
+        );
       }
 
-      // Pastikan wallet ada (hardening untuk user lama)
-      if (!user.wallet) {
-        user.wallet = {
-          balance: 0,
-          history: []
-        };
-      }
+      // 🔒 Hardening wallet untuk user lama
+      user.wallet ??= {
+        balance: 0,
+        history: []
+      };
 
-      const balance = user.wallet.balance || 0;
+      user.wallet.balance = Number(user.wallet.balance || 0);
+
+      const balance = user.wallet.balance;
       const totalHistory = user.wallet.history.length;
 
-      ctx.reply(
+      // 🔐 ESCAPE SEMUA INPUT USER
+      const name = escapeMarkdown(ctx.from.first_name || "-");
+      const username = escapeMarkdown(user.telegram.username || "-");
+      const role = escapeMarkdown(user.telegram.role.toUpperCase());
+
+      const msg =
 `💰 *SALDO AKUN*
 
-Nama     : ${ctx.from.first_name || "-"}
-Username : @${user.telegram.username}
-Role     : ${user.telegram.role.toUpperCase()}
+Nama     : ${name}
+Username : @${username}
+Role     : ${role}
 
 Saldo Aktif : *${formatRupiah(balance)}*
 Riwayat     : ${totalHistory} transaksi
 
 Gunakan /pricelist untuk melihat paket
-atau hubungi admin untuk deposit.`,
-        { parse_mode: "Markdown" }
-      );
+atau hubungi admin untuk deposit.`;
+
+      return ctx.reply(msg, { parse_mode: "Markdown" });
     }
   );
 };
