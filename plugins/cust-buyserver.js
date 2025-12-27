@@ -10,6 +10,17 @@ function randomPassword() {
   return Math.random().toString(36).slice(-10);
 }
 
+/**
+ * Format timestamp ke DD/MM/YYYY
+ */
+function formatDate(timestamp) {
+  const d = new Date(timestamp);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 export default bot => {
   bot.command(
     "buyserver",
@@ -33,7 +44,7 @@ export default bot => {
         const user = ctx.db.users[ctx.from.id];
 
         // =====================
-        // 🔒 NORMALISASI WALLET (INI KUNCI)
+        // 🔒 NORMALISASI WALLET
         // =====================
         user.wallet ??= { balance: 0, history: [] };
         user.wallet.balance = Number(user.wallet.balance || 0);
@@ -72,17 +83,28 @@ Saldo kamu  : Rp${user.wallet.balance.toLocaleString("id-ID")}`
             email: `${ctx.from.id}@user.voltrapedia`
           };
 
-          // JANGAN UBAH OWNER
+          // Jangan turunkan owner
           if (user.telegram.role === "user") {
             user.telegram.role = "customer";
           }
         }
 
         // =====================
+        // EXPIRED & DESCRIPTION
+        // =====================
+        const expiredAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        const expiredDate = formatDate(expiredAt);
+
+        const description =
+`Expired date: ${expiredDate}
+Tenant: (@${user.telegram.username})`;
+
+        // =====================
         // CREATE SERVER
         // =====================
         const resServer = await api.post("/servers", {
           name: serverName,
+          description, // 🔥 DESKRIPSI MASUK KE PANEL
           user: panelUserId,
           egg: config.DEFAULT_EGG_ID,
           docker_image: "docker.io/bionicc/nodejs-wabot:latest",
@@ -113,23 +135,24 @@ Saldo kamu  : Rp${user.wallet.balance.toLocaleString("id-ID")}`
 
         // =====================
         // SAVE DATABASE
-        // ====================
+        // =====================
         user.servers.push({
           server_id: server.identifier,
           panel_id: server.id,
           name: server.name,
           package: orderId,
-          
+          description,
+
           resource: {
-           ram: pkg.ram,
-           disk: pkg.disk,
-           cpu: pkg.cpu
+            ram: pkg.ram,
+            disk: pkg.disk,
+            cpu: pkg.cpu
           },
-          
+
           expired: {
-           duration: "30 hari",
-           expired_at: Date.now() + 30 * 24 * 60 * 60 * 1000,
-           text: "30 hari"
+            duration: "30 Hari",
+            expired_at: expiredAt,
+            text: "30 Hari"
           }
         });
 
@@ -156,6 +179,8 @@ Saldo kamu  : Rp${user.wallet.balance.toLocaleString("id-ID")}`
 RAM  : ${pkg.ram} MB
 Disk : ${pkg.disk} MB
 CPU  : ${pkg.cpu === 0 ? "Unlimited" : pkg.cpu + "%"}
+
+⏳ Expired   : ${expiredDate}
 
 💰 Harga : Rp${pkg.price.toLocaleString("id-ID")}
 💳 Sisa Saldo : Rp${user.wallet.balance.toLocaleString("id-ID")}
