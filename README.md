@@ -105,8 +105,9 @@ export default {
 ```
 🚀 Instalasi
 ```
-git clone https://github.com/username/telegram-pterodactyl-bot
-cd telegram-pterodactyl-bot
+git clone https://github.com/syawalokta/telebot-panel
+cd telebot-panel
+cp example.config.js config.js
 npm install
 npm start
 ```
@@ -120,7 +121,7 @@ npm start
 🛡️ Keamanan & Stabilitas
 
 - Escape Markdown (anti crash nama user)
-- Ignore message lama saat restart
+- Ignore message lama
 - Auto save database
 - Proteksi command konflik
 - Hardening owner role
