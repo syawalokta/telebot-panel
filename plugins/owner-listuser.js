@@ -23,7 +23,7 @@ EMAIL USER: ${u.attributes.email}
 `;
   }
 
-  // Pagination buttons
+  // buttons
   const buttons = [];
 
   if (meta.current_page > 1) {
@@ -57,7 +57,6 @@ EMAIL USER: ${u.attributes.email}
 }
 
 export default bot => {
-  // Command /listuser
   bot.command(
     "listuser",
     permission(["owner"]),

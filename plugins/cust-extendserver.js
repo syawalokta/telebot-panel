@@ -2,9 +2,6 @@ import permission from "../lib/permission.js";
 import api from "../lib/api.js";
 import { PACKAGES } from "../lib/packages.js";
 
-/**
- * Format timestamp ke DD/MM/YYYY
- */
 function formatDate(ts) {
   const d = new Date(ts);
   const day = String(d.getDate()).padStart(2, "0");
@@ -13,15 +10,9 @@ function formatDate(ts) {
   return `${day}/${month}/${year}`;
 }
 
-// STATE KONFIRMASI (IN-MEMORY)
 const confirmState = {};
 
 export default bot => {
-  /**
-   * =========================
-   * /extendserver SERVER_ID
-   * =========================
-   */
   bot.command(
     "extendserver",
     permission(["customer", "admin", "owner"]),
@@ -43,7 +34,6 @@ export default bot => {
         return ctx.reply("❌ Server ini tidak mendukung perpanjangan.");
       }
 
-      // SIMPAN STATE KONFIRMASI
       confirmState[ctx.from.id] = {
         serverId: server.server_id
       };
@@ -73,16 +63,9 @@ Ketik *batal* untuk membatalkan`,
     }
   );
 
-  /**
-   * ==================================
-   * HANDLE KONFIRMASI (lanjut / batal)
-   * ==================================
-   */
   bot.use(async (ctx, next) => {
-    // HANYA TEXT BIASA
     if (!ctx.message?.text) return next();
 
-    // JANGAN SENTUH COMMAND
     if (ctx.message.text.startsWith("/")) return next();
 
     const state = confirmState[ctx.from.id];
@@ -96,7 +79,6 @@ Ketik *batal* untuk membatalkan`,
       s => s.server_id === state.serverId
     );
 
-    // HAPUS STATE
     delete confirmState[ctx.from.id];
 
     if (!server) {
@@ -104,18 +86,13 @@ Ketik *batal* untuk membatalkan`,
       return;
     }
 
-    // BATAL
     if (text === "batal") {
       await ctx.reply("❌ Perpanjangan server dibatalkan.");
       return;
     }
 
-    // =====================
-    // PROSES EXTEND
-    // =====================
     const pkg = PACKAGES[server.package];
 
-    // NORMALISASI WALLET
     user.wallet ??= { balance: 0, history: [] };
     user.wallet.balance = Number(user.wallet.balance || 0);
 
@@ -129,7 +106,6 @@ Saldo kamu   : Rp${user.wallet.balance.toLocaleString("id-ID")}`
       return;
     }
 
-    // HITUNG EXPIRED BARU
     const baseExpired =
       server.expired?.expired_at && server.expired.expired_at > Date.now()
         ? server.expired.expired_at
@@ -140,14 +116,12 @@ Saldo kamu   : Rp${user.wallet.balance.toLocaleString("id-ID")}`
 
     const expiredDate = formatDate(newExpiredAt);
 
-    // UPDATE DATABASE
     server.expired = {
       duration: "30 Hari",
       expired_at: newExpiredAt,
       text: "30 Hari"
     };
 
-    // UPDATE DESCRIPTION PANEL
     const description =
 `Expired date: ${expiredDate}
 Tenant: (@${user.telegram.username})`;
@@ -165,7 +139,6 @@ Tenant: (@${user.telegram.username})`;
   );
 }
 
-    // POTONG SALDO + HISTORY
     user.wallet.balance -= pkg.extend;
     user.wallet.history.push({
       type: "extendserver",

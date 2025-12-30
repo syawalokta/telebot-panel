@@ -36,7 +36,6 @@ export default bot => {
       deposit.rejected_by = ctx.from.id.toString();
       deposit.reason = reason;
 
-      // ===== RESPONSE KE ADMIN =====
       await ctx.reply(
 `❌ *DEPOSIT DITOLAK*
 
@@ -51,7 +50,6 @@ ${reason}`,
         { parse_mode: "Markdown" }
       );
 
-      // ===== NOTIFIKASI KE USER =====
       try {
         await bot.telegram.sendMessage(
           deposit.user_id,

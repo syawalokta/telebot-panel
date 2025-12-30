@@ -1,9 +1,6 @@
 import permission from "../lib/permission.js";
 import api from "../lib/api.js";
 
-/**
- * Cari server & pemiliknya
- */
 function findServer(db, serverId) {
   for (const user of Object.values(db.users)) {
     const index = user.servers?.findIndex(
@@ -31,7 +28,6 @@ export default bot => {
           );
         }
 
-        // ===== CARI SERVER =====
         const result = findServer(ctx.db, serverId);
         if (!result) {
           return ctx.reply("❌ Server ID tidak ditemukan di database.");
@@ -40,13 +36,10 @@ export default bot => {
         const { user, index } = result;
         const server = user.servers[index];
 
-        // ===== DELETE DI PANEL =====
         await api.delete(`/servers/${server.panel_id}`);
 
-        // ===== HAPUS DARI DATABASE =====
         user.servers.splice(index, 1);
 
-        // ===== RESPONSE =====
         await ctx.reply(
 `✅ Server berhasil dihapus
 
@@ -55,7 +48,7 @@ Nama      : ${server.name}
 Server ID : ${server.server_id}`
         );
 
-        // Notifikasi ke user
+        // Notifikasi user
         try {
           await bot.telegram.sendMessage(
             user.telegram.id,

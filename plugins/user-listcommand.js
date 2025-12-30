@@ -4,9 +4,6 @@ import permission from "../lib/permission.js";
 const PLUGIN_DIR = "./plugins";
 const VALID_ROLES = ["user", "cust", "admin", "owner"];
 
-/**
- * Ambil semua command dari nama file plugin
- */
 function getAllCommands() {
   const files = fs.readdirSync(PLUGIN_DIR).filter(f => f.endsWith(".js"));
 
@@ -15,7 +12,6 @@ function getAllCommands() {
       const name = file.replace(".js", "");
       const [role, ...rest] = name.split("-");
 
-      // skip file yang tidak sesuai konvensi
       if (!VALID_ROLES.includes(role) || rest.length === 0) {
         return null;
       }
@@ -28,9 +24,6 @@ function getAllCommands() {
     .filter(Boolean);
 }
 
-/**
- * Role hierarchy
- */
 function canSee(userRole, cmdRole) {
   const hierarchy = ["user", "cust", "admin", "owner"];
   return hierarchy.indexOf(userRole) >= hierarchy.indexOf(cmdRole);
@@ -44,7 +37,6 @@ export default bot => {
       const rawRole =
         ctx.db.users[ctx.from.id]?.telegram?.role || "user";
 
-      // samakan role db ke prefix
       const userRole = rawRole === "customer" ? "cust" : rawRole;
 
       const commands = getAllCommands();

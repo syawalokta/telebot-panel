@@ -1,15 +1,9 @@
 import permission from "../lib/permission.js";
 
-/**
- * Format Rupiah
- */
 function formatRupiah(num = 0) {
   return "Rp " + num.toLocaleString("id-ID");
 }
 
-/**
- * Format timestamp ke DD/MM/YYYY HH:mm
- */
 function formatDate(ts) {
   if (!ts) return "-";
   const d = new Date(ts);
@@ -22,9 +16,6 @@ function formatDate(ts) {
 
 export default bot => {
 
-  // ===============================
-  // /invoicelist (PENDING ONLY)
-  // ===============================
   bot.command(
     "invoicelist",
     permission(["owner", "admin"]),
@@ -56,9 +47,6 @@ Waktu  : ${formatDate(d.created_at)}
     }
   );
 
-  // ===============================
-  // /invoicestatus (ALL)
-  // ===============================
   bot.command(
     "invoicestatus",
     permission(["owner", "admin"]),

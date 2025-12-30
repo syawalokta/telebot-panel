@@ -1,8 +1,5 @@
 import permission from "../lib/permission.js";
 
-/**
- * Format rupiah
- */
 function formatRupiah(num = 0) {
   return "Rp " + num.toLocaleString("id-ID");
 }
@@ -15,7 +12,6 @@ export default bot => {
       const input = ctx.message.text.replace("/addsaldo", "").trim();
       const [id, amount] = input.split(",").map(v => v?.trim());
 
-      // ===== VALIDASI INPUT =====
       if (!id || !amount) {
         return ctx.reply(
           "❌ Format salah\n\n/addsaldo idtele,nominal"
@@ -36,7 +32,6 @@ export default bot => {
         return ctx.reply("❌ User belum terdaftar. Pastikan user sudah /start.");
       }
 
-      // ===== PASTIKAN WALLET ADA =====
       if (!user.wallet) {
         user.wallet = {
           balance: 0,
@@ -44,7 +39,6 @@ export default bot => {
         };
       }
 
-      // ===== TAMBAH SALDO =====
       user.wallet.balance += nominal;
 
       user.wallet.history.push({
@@ -55,7 +49,6 @@ export default bot => {
         date: Date.now()
       });
 
-      // ===== RESPONSE KE ADMIN =====
       ctx.reply(
 `✅ *Saldo berhasil ditambahkan*
 
@@ -66,7 +59,6 @@ Saldo    : ${formatRupiah(user.wallet.balance)}`,
         { parse_mode: "Markdown" }
       );
 
-      // ===== NOTIFIKASI KE USER =====
       try {
         bot.telegram.sendMessage(
           id,

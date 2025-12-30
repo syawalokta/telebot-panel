@@ -1,8 +1,5 @@
 import permission from "../lib/permission.js";
 
-/**
- * Format timestamp ke DD/MM/YYYY
- */
 function formatDate(timestamp) {
   const d = new Date(timestamp);
   const day = String(d.getDate()).padStart(2, "0");
@@ -11,9 +8,6 @@ function formatDate(timestamp) {
   return `${day}/${month}/${year}`;
 }
 
-/**
- * Hitung sisa hari
- */
 function remainingDays(expiredAt) {
   const now = Date.now();
   const diff = expiredAt - now;

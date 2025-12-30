@@ -3,16 +3,10 @@ import api from "../lib/api.js";
 import config from "../config.js";
 import { PACKAGES } from "../lib/packages.js";
 
-/**
- * Generate password panel
- */
 function randomPassword() {
   return Math.random().toString(36).slice(-10);
 }
 
-/**
- * Format timestamp ke DD/MM/YYYY
- */
 function formatDate(timestamp) {
   const d = new Date(timestamp);
   const day = String(d.getDate()).padStart(2, "0");
@@ -43,9 +37,6 @@ export default bot => {
 
         const user = ctx.db.users[ctx.from.id];
 
-        // =====================
-        // 🔒 NORMALISASI WALLET
-        // =====================
         user.wallet ??= { balance: 0, history: [] };
         user.wallet.balance = Number(user.wallet.balance || 0);
 
@@ -58,9 +49,6 @@ Saldo kamu  : Rp${user.wallet.balance.toLocaleString("id-ID")}`
           );
         }
 
-        // =====================
-        // USER PANEL
-        // =====================
         let panelUserId = user.panel?.user_id;
         let panelPassword = null;
 
@@ -83,15 +71,11 @@ Saldo kamu  : Rp${user.wallet.balance.toLocaleString("id-ID")}`
             email: `${ctx.from.id}@user.voltrapedia`
           };
 
-          // Jangan turunkan owner
           if (user.telegram.role === "user") {
             user.telegram.role = "customer";
           }
         }
 
-        // =====================
-        // EXPIRED & DESCRIPTION
-        // =====================
         const expiredAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
         const expiredDate = formatDate(expiredAt);
 
@@ -99,12 +83,9 @@ Saldo kamu  : Rp${user.wallet.balance.toLocaleString("id-ID")}`
 `Expired date: ${expiredDate}
 Tenant: (@${user.telegram.username})`;
 
-        // =====================
-        // CREATE SERVER
-        // =====================
         const resServer = await api.post("/servers", {
           name: serverName,
-          description, // 🔥 DESKRIPSI MASUK KE PANEL
+          description, 
           user: panelUserId,
           egg: config.DEFAULT_EGG_ID,
           docker_image: "docker.io/bionicc/nodejs-wabot:latest",
@@ -133,9 +114,6 @@ Tenant: (@${user.telegram.username})`;
 
         const server = resServer.data.attributes;
 
-        // =====================
-        // SAVE DATABASE
-        // =====================
         user.servers.push({
           server_id: server.identifier,
           panel_id: server.id,
@@ -156,7 +134,6 @@ Tenant: (@${user.telegram.username})`;
           }
         });
 
-        // POTONG SALDO + CATAT HISTORY
         user.wallet.balance -= pkg.price;
         user.wallet.history.push({
           type: "buyserver",
@@ -166,9 +143,6 @@ Tenant: (@${user.telegram.username})`;
           date: Date.now()
         });
 
-        // =====================
-        // RESPONSE USER
-        // =====================
         let msg =
 `✅ *SERVER BERHASIL DIBELI*
 

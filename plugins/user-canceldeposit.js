@@ -9,7 +9,6 @@ export default bot => {
       const userId = ctx.from.id.toString();
       const deposits = ctx.db.deposits || {};
 
-      // Cari invoice pending milik user
       const invoice = Object.values(deposits).find(
         d => d.user_id === userId && d.status === "pending"
       );
@@ -24,11 +23,9 @@ dengan status *PENDING*.`,
         );
       }
 
-      // Batalkan invoice
       invoice.status = "cancelled";
       invoice.cancelled_at = Date.now();
 
-      // Bersihkan state deposit (in-memory)
       clearDepositState(ctx.from.id);
 
       return ctx.reply(

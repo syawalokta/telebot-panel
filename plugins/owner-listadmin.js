@@ -4,9 +4,6 @@ import { Markup } from "telegraf";
 
 const PER_PAGE = 5;
 
-/**
- * Ambil semua admin panel (root_admin)
- */
 async function fetchAdmins() {
   let page = 1;
   let admins = [];
@@ -71,7 +68,6 @@ EMAIL USER: ${u.attributes.email}
 }
 
 export default bot => {
-  // /listadmin command
   bot.command(
     "listadmin",
     permission(["owner"]),
@@ -85,7 +81,6 @@ export default bot => {
     }
   );
 
-  // Pagination callback
   bot.action(
     /^listadmin:(\d+)$/,
     permission(["owner"]),

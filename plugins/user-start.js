@@ -9,7 +9,6 @@ export default bot => {
 
     if (!ctx.db.users) ctx.db.users = {};
 
-    // Create / patch user
     if (!ctx.db.users[id]) {
       ctx.db.users[id] = {
         telegram: {

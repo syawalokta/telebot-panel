@@ -34,7 +34,6 @@ export default bot => {
           return ctx.reply("❌ Kamu tidak punya akses ke server ini.");
         }
 
-        // ===== POWER STOP =====
         await clientApi.post(
           `/servers/${server.server_id}/power`,
           { signal: "stop" }

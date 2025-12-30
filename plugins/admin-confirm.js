@@ -1,8 +1,5 @@
 import permission from "../lib/permission.js";
 
-/**
- * Format Rupiah
- */
 function formatRupiah(num = 0) {
   return "Rp " + num.toLocaleString("id-ID");
 }
@@ -39,7 +36,6 @@ export default bot => {
         return ctx.reply("❌ User tidak ditemukan di database.");
       }
 
-      // Pastikan wallet ada
       if (!user.wallet) {
         user.wallet = {
           balance: 0,
@@ -47,7 +43,6 @@ export default bot => {
         };
       }
 
-      // ===== TAMBAH SALDO =====
       user.wallet.balance += deposit.amount;
 
       user.wallet.history.push({
@@ -60,12 +55,10 @@ export default bot => {
         date: Date.now()
       });
 
-      // Update status deposit
       deposit.status = "success";
       deposit.confirmed_at = Date.now();
       deposit.confirmed_by = ctx.from.id.toString();
 
-      // ===== RESPONSE KE OWNER / ADMIN =====
       await ctx.reply(
 `✅ *DEPOSIT DIKONFIRMASI*
 
@@ -80,7 +73,6 @@ ${formatRupiah(user.wallet.balance)}`,
         { parse_mode: "Markdown" }
       );
 
-      // ===== NOTIFIKASI KE USER =====
       try {
         await bot.telegram.sendMessage(
           deposit.user_id,

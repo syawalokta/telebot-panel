@@ -1,9 +1,6 @@
 import permission from "../lib/permission.js";
 import clientApi from "../lib/clientApi.js";
 
-/**
- * Cari server & owner
- */
 function findServerOwner(db, serverId) {
   for (const user of Object.values(db.users)) {
     const server = user.servers?.find(s => s.server_id === serverId);
@@ -30,7 +27,6 @@ export default bot => {
 
         const { user, server } = result;
 
-        // Customer hanya boleh server sendiri
         if (
           ctx.db.users[ctx.from.id].telegram.role === "customer" &&
           user.telegram.id !== ctx.from.id.toString()
@@ -38,7 +34,6 @@ export default bot => {
           return ctx.reply("❌ Kamu tidak punya akses ke server ini.");
         }
 
-        // ===== POWER START =====
         await clientApi.post(
           `/servers/${server.server_id}/power`,
           { signal: "start" }

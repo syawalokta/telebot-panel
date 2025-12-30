@@ -32,19 +32,15 @@ export default bot => {
         const panelUserId = user.panel.user_id;
         const isOwner = teleid === config.OWNER_ID.toString();
 
-        // ===== DELETE USER PANEL =====
         await api.delete(`/users/${panelUserId}`);
 
-        // ===== RESET RELATION =====
         user.panel = {};
         user.servers = [];
 
-        // ===== ROLE HANDLING =====
         if (!isOwner) {
           user.telegram.role = "user";
         }
 
-        // ===== MESSAGE =====
         const ownerMsg =
 `✅ User panel berhasil dihapus
 
@@ -55,7 +51,6 @@ Role        : ${user.telegram.role}`;
 
         await ctx.reply(ownerMsg);
 
-        // Notifikasi ke user (best effort)
         try {
           await bot.telegram.sendMessage(
             teleid,

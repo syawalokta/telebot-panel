@@ -58,16 +58,12 @@ export default bot => {
 
         const panelUser = res.data.attributes;
 
-        // ===== SAVE DB =====
         tgUser.panel = {
           user_id: panelUser.id,
           email: panelUser.email
         };
         tgUser.telegram.role = "customer";
 
-        /* =======================
-           MESSAGE TO OWNER
-        ======================= */
         const ownerMsg =
 `✅ Berhasil membuat user dan sukses dikirim
 
@@ -81,9 +77,6 @@ Password : ${password}
 
         await ctx.reply(ownerMsg, { parse_mode: "Markdown" });
 
-        /* =======================
-           MESSAGE TO USER
-        ======================= */
         const userMsg =
 `✅ Akun Panel Pterodactyl Berhasil Dibuat
 

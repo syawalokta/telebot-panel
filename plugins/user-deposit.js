@@ -9,7 +9,6 @@ import {
 
 export default bot => {
 
-  // /deposit
   bot.command(
     "deposit",
     permission(["user", "customer", "admin", "owner"]),
@@ -28,18 +27,14 @@ Silakan pilih metode deposit:`,
     }
   );
 
-  // pilih manual
   bot.action("deposit_manual", ctx => {
     ctx.answerCbQuery();
     startManualDeposit(ctx);
   });
 
-  // pilih metode bayar
   bot.action(/^pay_/, handlePaymentMethod);
 
-  // text handler
   bot.on("text", handleDepositText);
 
-  // photo handler
   bot.on("photo", handleDepositPhoto);
 };

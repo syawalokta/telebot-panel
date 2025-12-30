@@ -1,9 +1,6 @@
 import permission from "../lib/permission.js";
 import { escapeMarkdown } from "../lib/escape.js";
 
-/**
- * Format Rupiah
- */
 function formatRupiah(num = 0) {
   return "Rp " + Number(num || 0).toLocaleString("id-ID");
 }
@@ -22,7 +19,6 @@ export default bot => {
         );
       }
 
-      // 🔒 Hardening wallet untuk user lama
       user.wallet ??= {
         balance: 0,
         history: []
@@ -33,7 +29,6 @@ export default bot => {
       const balance = user.wallet.balance;
       const totalHistory = user.wallet.history.length;
 
-      // 🔐 ESCAPE SEMUA INPUT USER
       const name = escapeMarkdown(ctx.from.first_name || "-");
       const username = escapeMarkdown(user.telegram.username || "-");
       const role = escapeMarkdown(user.telegram.role.toUpperCase());

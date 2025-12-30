@@ -1,9 +1,6 @@
 import permission from "../lib/permission.js";
 import { escapeMarkdown } from "../lib/escape.js";
 
-/**
- * Format angka ke Rupiah
- */
 function formatRupiah(amount = 0) {
   return "Rp " + amount.toLocaleString("id-ID");
 }
@@ -19,7 +16,6 @@ export default bot => {
         return ctx.reply("❌ Data user tidak ditemukan.");
       }
 
-      // 🔒 ESCAPE MARKDOWN (WAJIB)
       const name = escapeMarkdown(ctx.from.first_name || "-");
       const username = escapeMarkdown(user.telegram.username || "-");
       const role = (user.telegram.role || "user").toUpperCase();
@@ -46,7 +42,6 @@ export default bot => {
         totalCpu += Number(srv.resource?.cpu || 0);
       }
 
-      // WALLET
       const balance = Number(user.wallet?.balance || 0);
 
       const msg =

@@ -3,9 +3,6 @@ import api from "../lib/api.js";
 import config from "../config.js";
 import { generateExpired } from "../lib/expired.js";
 
-/**
- * Cari user Telegram berdasarkan PANEL USER ID
- */
 function findUserByPanelId(db, panelUserId) {
   for (const user of Object.values(db.users)) {
     if (user.panel?.user_id === Number(panelUserId)) {
@@ -15,9 +12,6 @@ function findUserByPanelId(db, panelUserId) {
   return null;
 }
 
-/**
- * Format timestamp ke DD/MM/YYYY
- */
 function formatDate(timestamp) {
   const d = new Date(timestamp);
   const day = String(d.getDate()).padStart(2, "0");
@@ -47,7 +41,6 @@ export default bot => {
           return ctx.reply("❌ idpanel, ram, disk, cpu, expired harus angka.");
         }
 
-        // ===== CARI USER BERDASARKAN PANEL ID =====
         const user = findUserByPanelId(ctx.db, panelUserId);
         if (!user) {
           return ctx.reply(
@@ -55,7 +48,6 @@ export default bot => {
           );
         }
 
-        // ===== VALIDASI ROLE TARGET (FIXED) =====
         if (!["customer", "owner"].includes(user.telegram.role)) {
           return ctx.reply(
             "❌ Server hanya bisa dibuat untuk user CUSTOMER atau OWNER."
@@ -65,25 +57,21 @@ export default bot => {
         if (!user.panel?.user_id) {
           return ctx.reply("❌ User belum memiliki akun panel.");
         }
-
-        // ===== EXPIRED =====
+        
         const expiredDays = Number(expired);
         const expiredData = generateExpired(expiredDays);
         const expiredDateText = formatDate(expiredData.expired_at);
 
-        // ===== DESKRIPSI OTOMATIS =====
         const description =
 `Expired date: ${expiredDateText}
 Tenant: (@${user.telegram.username})`;
 
-        // ===== CREATE SERVER DI PANEL =====
         const res = await api.post("/servers", {
           name: serverName,
           description,
           user: user.panel.user_id,
           egg: config.DEFAULT_EGG_ID,
 
-          // SESUAI EGG OKTODEV
           docker_image: "docker.io/bionicc/nodejs-wabot:latest",
           startup: "{{STARTUP_CMD}}",
           environment: {
@@ -113,7 +101,6 @@ Tenant: (@${user.telegram.username})`;
 
         const server = res.data.attributes;
 
-        // ===== SIMPAN KE DATABASE =====
         if (!user.servers) user.servers = [];
 
         user.servers.push({
@@ -129,7 +116,6 @@ Tenant: (@${user.telegram.username})`;
           expired: expiredData
         });
 
-        // ===== RESPONSE KE ADMIN / OWNER =====
         await ctx.reply(
 `✅ *Server berhasil dibuat*
 
